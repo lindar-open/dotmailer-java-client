@@ -6,6 +6,7 @@ import com.lindar.dotmailer.util.ErrorTranslator;
 import com.lindar.dotmailer.vo.internal.DMAccessCredentials;
 import com.lindar.dotmailer.vo.internal.ErrorResponse;
 import com.lindar.wellrested.WellRestedRequest;
+import com.lindar.wellrested.json.GsonJsonMapper;
 import com.lindar.wellrested.vo.Result;
 import com.lindar.wellrested.vo.ResultBuilder;
 import com.lindar.wellrested.vo.WellRestedResponse;
@@ -149,24 +150,18 @@ public abstract class AbstractResource {
     }
 
     <T> Result<List<T>> sendAndGetFullList(String resourcePath, TypeToken<List<T>> typeToken) {
-        return sendAndGetFullList(resourcePath, null, null, typeToken, DEFAULT_MAX_SELECT, 0);
+        return sendAndGetFullList(resourcePath, typeToken, DEFAULT_MAX_SELECT, 0);
     }
 
     protected <T> Result<List<T>> sendAndGetFullList(String resourcePath, TypeToken<List<T>> typeToken, int maxSelect) {
-        return sendAndGetFullList(resourcePath, null, null, typeToken, maxSelect, 0);
+        return sendAndGetFullList(resourcePath, typeToken, maxSelect, 0);
     }
 
     <T> Result<List<T>> sendAndGetFullList(String resourcePath, TypeToken<List<T>> typeToken, int maxSelect, int limit) {
-        return sendAndGetFullList(resourcePath, null, null, typeToken, maxSelect, limit);
+        return sendAndGetFullList(resourcePath, typeToken, maxSelect, limit);
     }
 
-    <T, K> Result<List<T>> sendAndGetFullList(String resourcePath, Class<K> clazz, JsonDeserializer<K> jsonDeserializer, TypeToken<List<T>> typeToken,
-                                              int maxSelect, int limit) {
-        return sendAndGetFullList(resourcePath, clazz, jsonDeserializer, typeToken, maxSelect, limit, 0);
-    }
-
-    <T, K> Result<List<T>> sendAndGetFullList(String resourcePath, Class<K> clazz, JsonDeserializer<K> jsonDeserializer, TypeToken<List<T>> typeToken,
-                                              int maxSelect, int limit, int initialSkip) {
+    <T> Result<List<T>> sendAndGetFullList(String resourcePath, TypeToken<List<T>> typeToken, int maxSelect, int limit, int initialSkip) {
 
         if (resourcePath.contains("select") && resourcePath.contains("skip")) {
             return ResultBuilder.failed()
@@ -183,15 +178,11 @@ public abstract class AbstractResource {
                 skip += maxSelect;
                 String url = baseUrl + String.format(DM_SELECT_SKIP_ATTRIBUTES, maxSelect, skip);
                 log.trace("GeneratedUrl: {}", url);
-                WellRestedRequest request = WellRestedRequest.builder().url(url).credentials(accessCredentials.getUsername(), accessCredentials.getPassword()).build();
+                WellRestedRequest request = WellRestedRequest.builder().url(url)
+                                                             .credentials(accessCredentials.getUsername(), accessCredentials.getPassword()).build();
                 WellRestedResponse response = request.get().submit();
                 if (validResponse(response)) {
-                    List<T> newResults;
-                    if (clazz != null && jsonDeserializer != null) {
-                        newResults = response.fromJson().registerDeserializer(clazz, jsonDeserializer).castToList(typeToken);
-                    } else {
-                        newResults = response.fromJson().castToList(typeToken);
-                    }
+                    List<T> newResults = response.fromJson().castTo(typeToken);
                     allResults.addAll(newResults);
                     newResultsSize = newResults.size();
 
@@ -202,33 +193,18 @@ public abstract class AbstractResource {
                     return ResultBuilder.of(parseErrorResponse(response)).buildAndOverrideData(allResults);
                 }
             } catch (Exception ex) {
-                log.error("sendAndGetFullList: error occurred: {}", ex);
+                log.error("sendAndGetFullList: error occurred: ", ex);
                 return ResultBuilder.failed().msg(ex.getMessage()).code(ERROR_UNKNOWN).buildAndIgnoreData();
             }
         } while (newResultsSize != 0 && (limit <= 0 || allResults.size() < limit));
         return ResultBuilder.successful(allResults);
     }
 
-    protected <T> void sendAndProcessList(String resourcePath, Class<T> clazz, JsonDeserializer<T> jsonDeserializer, TypeToken<List<T>> typeToken, Consumer<List<T>> consumer) {
-        sendAndProcessList(resourcePath, clazz, jsonDeserializer, typeToken, DEFAULT_MAX_SELECT, DEFAULT_MAX_SELECT, consumer);
-    }
-
-    protected <T> void sendAndProcessList(String resourcePath, Class<T> clazz, JsonDeserializer<T> jsonDeserializer, TypeToken<List<T>> typeToken, int maxLimit, int perStep, Consumer<List<T>> consumer) {
-        int skip = 0;
-
-        Result<List<T>> results;
-        do {
-            results = sendAndGetFullList(resourcePath, clazz, jsonDeserializer, typeToken, maxLimit, perStep, skip);
-            results.ifSuccessAndNotNull(consumer);
-            skip += perStep;
-        } while (results.isSuccessAndNotNull() && !results.getData().isEmpty());
-    }
-
     protected <T> Result<List<T>> sendAndGetSingleList(String resourcePath, TypeToken<List<T>> typeToken) {
         WellRestedRequest request = buildRequestFromResourcePath(resourcePath);
         WellRestedResponse response = request.get().submit();
         if (validResponse(response)) {
-            return ResultBuilder.successful(response.fromJson().castToList(typeToken));
+            return ResultBuilder.successful(response.fromJson().castTo(typeToken));
         }
         return parseErrorResponse(response);
     }
