@@ -158,7 +158,7 @@ public abstract class AbstractResource {
     }
 
     <T> Result<List<T>> sendAndGetFullList(String resourcePath, TypeToken<List<T>> typeToken, int maxSelect, int limit) {
-        return sendAndGetFullList(resourcePath, typeToken, maxSelect, limit);
+        return sendAndGetFullList(resourcePath, typeToken, maxSelect, limit, 0);
     }
 
     <T> Result<List<T>> sendAndGetFullList(String resourcePath, TypeToken<List<T>> typeToken, int maxSelect, int limit, int initialSkip) {
