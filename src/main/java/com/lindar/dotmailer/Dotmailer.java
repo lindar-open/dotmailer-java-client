@@ -31,6 +31,7 @@ public class Dotmailer {
     private CampaignResource campaignResource;
     private DataFieldResource dataFieldResource;
     private TransactionalResource transactionalResource;
+    private ProgramResource programResource;
 
 
     private Dotmailer(DMAccessCredentials accessCredentials) {
@@ -41,6 +42,7 @@ public class Dotmailer {
         this.campaignResource = new CampaignResource(accessCredentials);
         this.dataFieldResource = new DataFieldResource(accessCredentials);
         this.transactionalResource = new TransactionalResource(accessCredentials);
+        this.programResource = new ProgramResource(accessCredentials);
     }
 
     /**
@@ -179,4 +181,12 @@ public class Dotmailer {
         return transactionalResource;
     }
 
+    /**
+     * returns a programs resource that allows to interact with all programs endpoints
+     *
+     * @return
+     */
+    public ProgramResource programs() {
+        return programResource;
+    }
 }

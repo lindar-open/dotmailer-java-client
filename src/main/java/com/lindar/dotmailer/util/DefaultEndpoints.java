@@ -9,9 +9,9 @@ import lombok.Getter;
 public enum DefaultEndpoints {
     API_URL ("https://r1-api.dotmailer.com"),
     VERSION ("/v2"),
-    
+
     ACCOUNT_INFO ("/account-info"),
-    
+
     CAMPAIGNS ("/campaigns"),
     CAMPAIGNS_WITH_ACTIVITY_SINCE("/campaigns/with-activity-since/%s"),
     CAMPAIGN_INFO ("/campaigns/%s"),
@@ -25,7 +25,7 @@ public enum DefaultEndpoints {
     ADDRESS_BOOK_CONTACTS_DELETE ("/address-books/%s/contacts/delete"),
     ADDRESS_BOOK_CONTACTS_IMPORT ("/address-books/%s/contacts/import"),
     ADDRESS_BOOK_CONTACTS_UNSUBSCRIBED_SINCE_DATE ("/address-books/%s/contacts/unsubscribed-since/%s"),
-    
+
     CONTACTS ("/contacts"),
     CONTACT ("/contacts/%s"),
     CONTACT_ADDRESS_BOOKS ("/contacts/%s/address-books"),
@@ -41,14 +41,20 @@ public enum DefaultEndpoints {
     DATA_FIELD ("/data-fields/%s"),
 
     EMAIL_TRIGGERED_CAMPAIGN ("/email/triggered-campaign"),
-    TRANSACTIONAL_EMAIL_STATS_SINCE_DATE ("/email/stats/since-date/%s");
+    TRANSACTIONAL_EMAIL_STATS_SINCE_DATE ("/email/stats/since-date/%s"),
+
+    PROGRAMS("/programs"),
+    PROGRAM("/programs/%s"),
+    PROGRAM_ENROLMENTS("/programs/enrolments"),
+    PROGRAM_ENROLMENT_BY_ID("/programs/enrolments/%s"),
+    PROGRAM_ENROLMENTS_BY_STATUS("/programs/enrolments/%s");
 
 
 
     @Getter
     private String path;
-    
-    private DefaultEndpoints(String path) {
+
+    DefaultEndpoints(String path) {
         this.path = path;
     }
 }
