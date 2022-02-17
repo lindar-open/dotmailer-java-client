@@ -41,6 +41,9 @@ public enum DefaultEndpoints {
     DATA_FIELD ("/data-fields/%s"),
 
     EMAIL_TRIGGERED_CAMPAIGN ("/email/triggered-campaign"),
+    EMAIL_TRIGGERED_CAMPAIGN_BATCH ("/email/triggered-campaign/batch"),
+    EMAIL ("/email"),
+    EMAIL_BATCH ("/email/batch"),
     TRANSACTIONAL_EMAIL_STATS_SINCE_DATE ("/email/stats/since-date/%s"),
 
     PROGRAMS("/programs"),

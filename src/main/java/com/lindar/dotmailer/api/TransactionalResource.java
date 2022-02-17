@@ -4,6 +4,7 @@ import com.lindar.dotmailer.util.DefaultEndpoints;
 import com.lindar.dotmailer.vo.api.AggregatedBy;
 import com.lindar.dotmailer.vo.api.TransactionalEmailStatistics;
 import com.lindar.dotmailer.vo.internal.DMAccessCredentials;
+import com.lindar.dotmailer.vo.internal.EmailRequest;
 import com.lindar.dotmailer.vo.internal.EmailTriggeredCampaignRequest;
 import com.lindar.dotmailer.vo.internal.NameValue;
 import com.lindar.wellrested.vo.Result;
@@ -26,20 +27,43 @@ public class TransactionalResource extends AbstractResource {
         super(accessCredentials);
     }
 
-    public Result<Void> send(List<String> toAddresses, int campaignId, Map<String, String> personalisation) {
-        return postAndGetBlankResponse(DefaultEndpoints.EMAIL_TRIGGERED_CAMPAIGN.getPath(), new EmailTriggeredCampaignRequest(toAddresses, campaignId, toNameValueList(personalisation)));
+    public Result<Void> send(List<String> toAddresses, int campaignId, Map<String, Object> personalisation, Map<String, Object> metadata) {
+        EmailTriggeredCampaignRequest request = EmailTriggeredCampaignRequest
+                .builder()
+                .toAddresses(toAddresses)
+                .campaignId(campaignId)
+                .personalizationValues(personalisation)
+                .metadata(metadata)
+                .build();
+        return postAndGetBlankResponse(DefaultEndpoints.EMAIL_TRIGGERED_CAMPAIGN.getPath(), request);
     }
 
     public Result<Void> send(List<String> toAddresses, int campaignId) {
-        return send(toAddresses, campaignId, new HashMap<>());
+        return send(toAddresses, campaignId, new HashMap<>(), new HashMap<>());
     }
 
-    public Result<Void> send(String email, int campaignId, Map<String, String> personalisation) {
-        return send(Collections.singletonList(email), campaignId, personalisation);
+    public Result<Void> send(String email, int campaignId, Map<String, Object> personalisation) {
+        return send(Collections.singletonList(email), campaignId, personalisation, new HashMap<>());
     }
 
     public Result<Void> send(String email, int campaignId) {
-        return send(Collections.singletonList(email), campaignId, new HashMap<>());
+        return send(Collections.singletonList(email), campaignId, new HashMap<>(), new HashMap<>());
+    }
+
+    public Result<Void> send(EmailRequest emailRequest) {
+        return postAndGetBlankResponse(DefaultEndpoints.EMAIL.getPath(), emailRequest);
+    }
+
+    public Result<Void> send(List<EmailRequest> emailRequest) {
+        return postAndGetBlankResponse(DefaultEndpoints.EMAIL_BATCH.getPath(), emailRequest);
+    }
+
+    public Result<Void> sendTriggeredCampaign(EmailTriggeredCampaignRequest emailRequest) {
+        return postAndGetBlankResponse(DefaultEndpoints.EMAIL_TRIGGERED_CAMPAIGN.getPath(), emailRequest);
+    }
+
+    public Result<Void> sendTriggeredCampaign(List<EmailTriggeredCampaignRequest> emailRequest) {
+        return postAndGetBlankResponse(DefaultEndpoints.EMAIL_TRIGGERED_CAMPAIGN_BATCH.getPath(), emailRequest);
     }
 
     public Result<TransactionalEmailStatistics> statistics(@NonNull LocalDate startDate, LocalDate endDate, AggregatedBy aggregatedBy) {
@@ -87,10 +111,10 @@ public class TransactionalResource extends AbstractResource {
     }
 
     private List<NameValue> toNameValueList(Map<String, String> map) {
-        if(map == null) return null;
+        if (map == null) return null;
         return map.entrySet().stream()
-                .map(entry -> new NameValue(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList());
+                  .map(entry -> new NameValue(entry.getKey(), entry.getValue()))
+                  .collect(Collectors.toList());
     }
 
 }
