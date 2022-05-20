@@ -6,6 +6,7 @@ import com.lindar.dotmailer.vo.api.Campaign;
 import com.lindar.dotmailer.vo.api.CampaignContactActivity;
 import com.lindar.dotmailer.vo.api.CampaignInfo;
 import com.lindar.dotmailer.vo.api.CampaignSummary;
+import com.lindar.dotmailer.vo.internal.CampaignRequest;
 import com.lindar.dotmailer.vo.internal.DMAccessCredentials;
 import com.lindar.wellrested.vo.Result;
 import com.lindar.wellrested.vo.ResultBuilder;
@@ -107,4 +108,7 @@ public class CampaignResource extends AbstractResource {
         return putAndGet(pathWithId(DefaultEndpoints.CAMPAIGN_INFO.getPath(), updateCampaign.getId()), updateCampaign);
     }
 
+    public Result<Void> send(CampaignRequest campaignRequest) {
+        return postAndGetBlankResponse(DefaultEndpoints.CAMPAIGN_SEND.getPath(), campaignRequest);
+    }
 }

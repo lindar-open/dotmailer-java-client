@@ -18,6 +18,7 @@ public enum DefaultEndpoints {
     CAMPAIGN_SUMMARY ("/campaigns/%s/summary"),
     CAMPAIGN_ACTIVITY ("/campaigns/%s/activities"),
     CAMPAIGN_ACTIVITY_SINCE ("/campaigns/%s/activities/since-date/%s"),
+    CAMPAIGN_SEND("/campaigns/send"),
 
     ADDRESS_BOOKS ("/address-books"),
     ADDRESS_BOOK ("/address-books/%s"),
