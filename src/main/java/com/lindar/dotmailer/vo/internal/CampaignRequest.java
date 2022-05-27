@@ -10,7 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 public class CampaignRequest {
-    private String campaignId;
+    private String       campaignId;
     private List<String> addressBookIds;
-    private List<Long>          contactIds;
+    private List<Long>   contactIds;
 }
